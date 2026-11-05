@@ -15,9 +15,11 @@ export type CardKind =
   | "research"
   | "education"
   | "contact"
-  | "resume";
+  | "resume"
+  | "role";
 
-export type Answer = { text: string; card?: CardKind; followUps: string[] };
+/* `focus` opens one role in the experience card (index into `experience`). */
+export type Answer = { text: string; card?: CardKind; focus?: number; followUps: string[] };
 
 type Topic = { match: RegExp; answer: () => Answer };
 
@@ -78,7 +80,7 @@ const topics: Topic[] = [
     match: /(clinical|decision[- ]support|multi[- ]?agent|ollama|healthcare|medical)/,
     answer: () => ({
       text: `At ${amity.org} I engineered and host a **multi-agent clinical decision-support platform** built with Ollama and Docker. It runs on an NVIDIA DGX A100 **MIG 7g.40gb** partition, and I've kept it at **99%+ uptime** while optimizing VRAM utilization.`,
-      card: "experience",
+      card: "role",
       followUps: ["How do you manage the DGX A100 servers?", "What are your skills?"],
     }),
   },
@@ -159,6 +161,7 @@ const topics: Topic[] = [
     answer: () => ({
       text: `From ${plancover.start} to ${plancover.end} I was a **${plancover.role}** at ${plancover.org}, ${plancover.place}. ${plancover.points[0]} I also applied Impact Factor metrics to claims MIS data to segment customers and flag high-risk policyholders, and worked with the tech team on a Quote Management System.`,
       card: "experience",
+      focus: 1,
       followUps: ["What do you do at Amity University?", "What are your skills?"],
     }),
   },
@@ -167,6 +170,7 @@ const topics: Topic[] = [
     answer: () => ({
       text: `From ${aapki.start} to ${aapki.end} I was **${aapki.role}** at ${aapki.org}. ${aapki.points.join(" ")}`,
       card: "experience",
+      focus: 2,
       followUps: ["Where have you worked?", "What do you do at Amity University?"],
     }),
   },
@@ -175,6 +179,7 @@ const topics: Topic[] = [
     answer: () => ({
       text: `I started my career as a **${cognizant.role}** at ${cognizant.org}, ${cognizant.place} (${cognizant.start} – ${cognizant.end}). ${cognizant.points.join(" ")}`,
       card: "experience",
+      focus: 3,
       followUps: ["Where have you worked?", "What do you do at Amity University?"],
     }),
   },
@@ -198,7 +203,7 @@ const topics: Topic[] = [
     match: /(amity|\bcurrent\w*|\bnow\b|\btoday\b|\bpresent\b|day job|ai engineer|what do you do|for a living|profession|occupation|working on|position|designation|job title|\bjob\b)/,
     answer: () => ({
       text: `Since ${amity.start} I've been an **${amity.role}** at ${amity.org}, ${amity.place}. I run AI research infrastructure on two NVIDIA DGX A100 servers, host a multi-agent clinical decision-support platform, develop models in PyTorch and TensorFlow, and deploy Streamlit AI/LLM apps for industry demos and research workflows.`,
-      card: "experience",
+      card: "role",
       followUps: ["Tell me about the clinical decision-support platform", "How do you manage the DGX A100 servers?"],
     }),
   },
@@ -294,9 +299,9 @@ function techAnswer(rawTerm: string): Answer | null {
 
   if (resolved) {
     const groups = skills.filter((g) => g.title === resolved || g.items.includes(resolved)).map((g) => g.title);
-    const roles = experience
-      .filter((e) => e.stack.includes(resolved) || e.points.some((p) => mentions(p, resolved)))
-      .map((e) => `${e.role} at ${e.org}`);
+    const usedIn = (e: (typeof experience)[number]) => e.stack.includes(resolved) || e.points.some((p) => mentions(p, resolved));
+    const roles = experience.filter(usedIn).map((e) => `${e.role} at ${e.org}`);
+    const firstRole = experience.findIndex(usedIn);
     const work = projects.filter((p) => p.stack.includes(resolved) || mentions(p.category, resolved) || p.points.some((x) => mentions(x, resolved)));
 
     const area = skills.find((g) => g.title === resolved);
@@ -310,6 +315,7 @@ function techAnswer(rawTerm: string): Answer | null {
     return {
       text: parts.join(" "),
       card: work.length && !roles.length ? "projects" : roles.length ? "experience" : "skills",
+      focus: firstRole >= 0 ? firstRole : undefined,
       followUps: ["What are your skills?", "What projects have you built?"],
     };
   }

@@ -12,72 +12,105 @@ import { suggestedQuestions } from "../lib/prompts";
 import { profile } from "../lib/profile";
 import ChatCard from "./ChatCards";
 
+/* One streamed word (with its trailing space); `b` marks **bold** text. */
+type Token = { t: string; b: boolean };
+
 type Message =
   | { id: number; role: "user"; text: string }
-  | { id: number; role: "assistant"; text: string; shown: number; card?: CardKind; followUps: string[]; thinking: boolean };
+  | {
+      id: number;
+      role: "assistant";
+      tokens: Token[];
+      shown: number;
+      card?: CardKind;
+      focus?: number;
+      followUps: string[];
+      thinking: boolean;
+    };
 
-/* Renders **bold** spans; that's the only formatting the answers use. */
-function RichText({ text }: { text: string }) {
-  return (
-    <>
-      {text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-        part.startsWith("**") ? (
-          <strong key={i} className="font-semibold">
-            {part.slice(2, -2)}
-          </strong>
-        ) : (
-          <span key={i}>{part}</span>
-        ),
-      )}
-    </>
-  );
+/* Splits an answer into words, keeping **bold** spans marked. */
+function tokenize(text: string): Token[] {
+  return text
+    .split(/(\*\*[^*]+\*\*)/g)
+    .filter(Boolean)
+    .flatMap((part) => {
+      const b = part.startsWith("**");
+      const body = b ? part.slice(2, -2) : part;
+      return (body.match(/\S+\s*|\s+/g) ?? []).map((t) => ({ t, b }));
+    });
 }
+
+const WORD_MS = 28; // delay between streamed words
+const THINK_MS = 550; // "typing…" pause before the answer starts
 
 export default function ChatView({ initialQuery, photo }: { initialQuery?: string; photo?: string | null }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [drawer, setDrawer] = useState(false);
-  const busy = useRef(false);
   const nextId = useRef(1);
   const started = useRef(false);
+  // the answer currently streaming, so a new question can finish it instead of being dropped
+  const stream = useRef<{ id: number; timeout?: ReturnType<typeof setTimeout>; interval?: ReturnType<typeof setInterval> } | null>(null);
 
-  const ask = useCallback((question: string) => {
-    if (busy.current) return;
-    busy.current = true;
-    setDrawer(false);
+  const finishStreaming = useCallback(() => {
+    const s = stream.current;
+    if (!s) return;
+    clearTimeout(s.timeout);
+    clearInterval(s.interval);
+    stream.current = null;
+    setMessages((m) =>
+      m.map((msg) => (msg.id === s.id && msg.role === "assistant" ? { ...msg, thinking: false, shown: msg.tokens.length } : msg)),
+    );
+  }, []);
 
-    const reply = answer(question);
-    const userId = nextId.current++;
-    const botId = nextId.current++;
-    setMessages((m) => [
-      ...m,
-      { id: userId, role: "user", text: question },
-      { id: botId, role: "assistant", text: reply.text, shown: 0, card: reply.card, followUps: reply.followUps, thinking: true },
-    ]);
+  const ask = useCallback(
+    (question: string) => {
+      finishStreaming();
+      setDrawer(false);
 
-    // short "thinking" pause, then stream the answer in word by word
-    const words = reply.text.split(/(\s+)/);
-    let i = 0;
-    setTimeout(() => {
-      const tick = setInterval(() => {
-        i = Math.min(words.length, i + 3);
-        const shown = words.slice(0, i).join("").length;
-        setMessages((m) => m.map((msg) => (msg.id === botId ? { ...msg, thinking: false, shown } : msg)));
-        if (i >= words.length) {
-          clearInterval(tick);
-          busy.current = false;
-        }
-      }, 35);
-    }, 550);
+      const reply = answer(question);
+      const tokens = tokenize(reply.text);
+      const userId = nextId.current++;
+      const botId = nextId.current++;
+      setMessages((m) => [
+        ...m,
+        { id: userId, role: "user", text: question },
+        { id: botId, role: "assistant", tokens, shown: 0, card: reply.card, focus: reply.focus, followUps: reply.followUps, thinking: true },
+      ]);
+
+      // short "thinking" pause, then stream the answer one word at a time
+      const s: NonNullable<typeof stream.current> = { id: botId };
+      stream.current = s;
+      s.timeout = setTimeout(() => {
+        let shown = 0;
+        s.interval = setInterval(() => {
+          shown += 1;
+          setMessages((m) => m.map((msg) => (msg.id === botId ? { ...msg, thinking: false, shown } : msg)));
+          if (shown >= tokens.length) {
+            clearInterval(s.interval);
+            if (stream.current === s) stream.current = null;
+          }
+        }, WORD_MS);
+      }, THINK_MS);
+    },
+    [finishStreaming],
+  );
+
+  // stop timers if the visitor leaves the page mid-answer
+  useEffect(() => () => {
+    clearTimeout(stream.current?.timeout);
+    clearInterval(stream.current?.interval);
   }, []);
 
   // answer the question passed from the landing page, then drop it from the URL so a refresh starts clean
   useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-    if (initialQuery) {
+    if (!initialQuery) return;
+    const t = setTimeout(() => {
+      if (started.current) return;
+      started.current = true;
       ask(initialQuery);
       window.history.replaceState(null, "", "/chat");
-    }
+    }, 0);
+    return () => clearTimeout(t);
   }, [ask, initialQuery]);
 
   // when a new question is asked, bring it to the top of the screen so the answer reads from its start
@@ -88,6 +121,7 @@ export default function ChatView({ initialQuery, photo }: { initialQuery?: strin
   }, [messages.length]);
 
   const empty = messages.length === 0;
+  const lastId = messages[messages.length - 1]?.id;
 
   return (
     <div className="relative flex min-h-svh flex-col">
@@ -151,18 +185,22 @@ export default function ChatView({ initialQuery, photo }: { initialQuery?: strin
                       </div>
                     ) : (
                       <p className="text-[17px] leading-relaxed">
-                        <RichText text={m.text.slice(0, m.shown)} />
-                        {m.shown < m.text.length && <span className="ml-0.5 inline-block h-4 w-0.5 animate-blink bg-foreground align-middle" />}
+                        {m.tokens.slice(0, m.shown).map((tk, i) => (
+                          <span key={i} className={`animate-word ${tk.b ? "font-semibold" : ""}`}>
+                            {tk.t}
+                          </span>
+                        ))}
                       </p>
                     )}
-                    {m.shown >= m.text.length && (
+                    {!m.thinking && m.shown >= m.tokens.length && (
                       <>
                         {m.card && (
-                          <div className="animate-fade-up" style={{ animationDuration: "0.5s" }}>
-                            <ChatCard kind={m.card} photo={photo} />
+                          <div className="animate-fade-up" style={{ animationDuration: "0.6s" }}>
+                            <ChatCard kind={m.card} photo={photo} focus={m.focus} />
                           </div>
                         )}
-                        <div className="flex animate-fade-up flex-wrap gap-2" style={{ animationDelay: "150ms" }}>
+                        {m.id === lastId && (
+                        <div className="flex animate-fade-up flex-wrap gap-2" style={{ animationDelay: "250ms" }}>
                           {m.followUps.map((f) => (
                             <button
                               key={f}
@@ -174,6 +212,7 @@ export default function ChatView({ initialQuery, photo }: { initialQuery?: strin
                             </button>
                           ))}
                         </div>
+                        )}
                       </>
                     )}
                   </div>

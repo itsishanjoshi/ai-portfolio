@@ -40,38 +40,101 @@ function AboutCard({ photo }: { photo?: string | null }) {
   );
 }
 
-function ExperienceCard() {
-  const [open, setOpen] = useState(0);
+/* Compact "current role" card: the answer to "What do you do?". */
+function RoleCard() {
+  const job = experience[0];
+  return (
+    <div className={`${shell} relative overflow-hidden`}>
+      <div className="pointer-events-none absolute -top-20 -right-20 h-48 w-48 rounded-full bg-emerald-500/10 blur-3xl" />
+      <div className="relative flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500/60" />
+              <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            </span>
+            Current role
+          </span>
+          <div className="text-lg font-semibold">{job.role}</div>
+          <div className="text-sm text-muted">
+            {job.org}, {job.place} · since {job.start}
+          </div>
+        </div>
+      </div>
+      <div className="relative mt-4 grid grid-cols-3 gap-2">
+        {highlights.slice(0, 3).map((h, i) => (
+          <div
+            key={h.label}
+            className="animate-fade-up rounded-2xl bg-subtle/70 p-3"
+            style={{ animationDelay: `${120 + i * 90}ms`, animationDuration: "0.5s" }}
+          >
+            <div className="text-xl font-bold tracking-tight">{h.value}</div>
+            <div className="text-xs leading-snug text-muted">{h.label}</div>
+          </div>
+        ))}
+      </div>
+      <div className="relative mt-4 flex flex-wrap gap-1.5">
+        {job.stack.map((s, i) => (
+          <span
+            key={s}
+            className="animate-fade-up rounded-md bg-subtle px-2 py-1 font-mono text-xs text-muted"
+            style={{ animationDelay: `${380 + i * 35}ms`, animationDuration: "0.4s" }}
+          >
+            {s}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* All roles as an accordion. Starts collapsed unless `focus` names a role; rows open with a height animation. */
+function ExperienceCard({ focus }: { focus?: number }) {
+  const [open, setOpen] = useState(focus ?? -1);
   return (
     <div className={`${shell} p-2`}>
-      {experience.map((e, i) => (
-        <div key={e.role} className={i ? "border-t border-border" : ""}>
-          <button
-            type="button"
-            onClick={() => setOpen(open === i ? -1 : i)}
-            aria-expanded={open === i}
-            className="flex w-full cursor-pointer items-center gap-3 rounded-2xl p-3 text-left transition-colors hover:bg-subtle/60"
+      {experience.map((e, i) => {
+        const on = open === i;
+        return (
+          <div
+            key={e.role}
+            className={`animate-fade-up ${i ? "border-t border-border" : ""}`}
+            style={{ animationDelay: `${i * 70}ms`, animationDuration: "0.45s" }}
           >
-            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${e.current ? "bg-emerald-500" : "bg-border-strong"}`} />
-            <span className="min-w-0 flex-1">
-              <span className="block font-semibold">{e.role}</span>
-              <span className="block text-sm text-muted">
-                {e.org} · {e.start} – {e.end}
+            <button
+              type="button"
+              onClick={() => setOpen(on ? -1 : i)}
+              aria-expanded={on}
+              className="flex w-full cursor-pointer items-center gap-3 rounded-2xl p-3 text-left transition-colors hover:bg-subtle/60"
+            >
+              <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${e.current ? "bg-emerald-500" : "bg-border-strong"}`} />
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold">{e.role}</span>
+                <span className="block text-sm text-muted">
+                  {e.org} · {e.start} – {e.end}
+                </span>
               </span>
-            </span>
-            <Icon name="chevron-down" className={`h-4 w-4 shrink-0 text-muted transition-transform ${open === i ? "rotate-180" : ""}`} />
-          </button>
-          {open === i && (
-            <ul className="animate-fade-up space-y-2 px-4 pb-4 pl-9" style={{ animationDuration: "0.4s" }}>
-              {e.points.map((p) => (
-                <li key={p} className="list-disc text-sm leading-relaxed text-foreground/85 marker:text-muted">
-                  {p}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      ))}
+              <Icon name="chevron-down" className={`h-4 w-4 shrink-0 text-muted transition-transform duration-300 ${on ? "rotate-180" : ""}`} />
+            </button>
+            {/* grid-rows 0fr -> 1fr animates to the content's real height */}
+            <div
+              className={`grid transition-[grid-template-rows,opacity] duration-400 ease-out ${
+                on ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <ul className="space-y-2 px-4 pb-4 pl-9">
+                  {e.points.map((p) => (
+                    <li key={p} className="list-disc text-sm leading-relaxed text-foreground/85 marker:text-muted">
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -152,12 +215,14 @@ function ResumeCard() {
   );
 }
 
-export default function ChatCard({ kind, photo }: { kind: CardKind; photo?: string | null }) {
+export default function ChatCard({ kind, photo, focus }: { kind: CardKind; photo?: string | null; focus?: number }) {
   switch (kind) {
     case "about":
       return <AboutCard photo={photo} />;
+    case "role":
+      return <RoleCard />;
     case "experience":
-      return <ExperienceCard />;
+      return <ExperienceCard focus={focus} />;
     case "projects":
       return <ProjectCards layout="carousel" />;
     case "skills":
