@@ -14,7 +14,7 @@ export const quickPrompts: { label: string; icon: IconName; color: string; quest
 export const suggestedQuestions: { group: string; questions: string[] }[] = [
   {
     group: "About",
-    questions: ["Who are you?", "What do you focus on?", "Where are you based?", "Can I see your resume?"],
+    questions: ["Who are you?", "What do you focus on?", "What do you do for fun?", "Where are you based?", "Can I see your resume?"],
   },
   {
     group: "Work",

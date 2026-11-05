@@ -1,6 +1,7 @@
 import Icon from "../Icons";
 import Reveal from "../Reveal";
 import SectionHeading from "../SectionHeading";
+import InterestTiles from "../InterestTiles";
 import Portrait from "../Portrait";
 import { getProfilePhoto } from "../lib/photo";
 import { highlights, links, profile } from "../lib/profile";
@@ -87,6 +88,16 @@ export default function About() {
           </div>
         </Reveal>
       </div>
+
+      <Reveal delay={160} className="mt-5">
+        <div id="interests" className="rounded-3xl border border-border bg-card p-6 backdrop-blur-lg md:p-8">
+          <div className="mb-5 flex items-baseline justify-between gap-4">
+            <h3 className="text-lg font-semibold">Off the clock</h3>
+            <span className="text-sm text-muted">What I enjoy outside work</span>
+          </div>
+          <InterestTiles />
+        </div>
+      </Reveal>
     </section>
   );
 }

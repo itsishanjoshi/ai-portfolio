@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import ContactCard from "../ContactCard";
 import Icon from "../Icons";
+import InterestTiles from "../InterestTiles";
 import Portrait from "../Portrait";
 import ProjectCards from "../ProjectCards";
 import PublicationList from "../PublicationList";
@@ -221,6 +222,12 @@ export default function ChatCard({ kind, photo, focus }: { kind: CardKind; photo
       return <AboutCard photo={photo} />;
     case "role":
       return <RoleCard />;
+    case "interests":
+      return (
+        <div className="rounded-3xl border border-border bg-card p-4 backdrop-blur-lg">
+          <InterestTiles compact />
+        </div>
+      );
     case "experience":
       return <ExperienceCard focus={focus} />;
     case "projects":

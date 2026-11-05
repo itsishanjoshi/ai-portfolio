@@ -140,7 +140,7 @@ export default function ChatView({ initialQuery, photo }: { initialQuery?: strin
             <span className="min-w-0">
               <span className="block truncate text-sm font-semibold">{profile.name}</span>
               <span className="flex items-center gap-1.5 text-xs text-muted">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Answers from my resume
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Answers from my profile
               </span>
             </span>
           </div>
@@ -162,7 +162,7 @@ export default function ChatView({ initialQuery, photo }: { initialQuery?: strin
             <Avatar />
             <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">Ask me anything</h1>
             <p className="mt-2 max-w-md text-muted">
-              About my work, research, projects or skills. Every answer comes straight from my resume.
+              About my work, research, projects, skills or interests. Every answer comes from my own profile.
             </p>
             <PromptTiles onPick={ask} />
           </div>

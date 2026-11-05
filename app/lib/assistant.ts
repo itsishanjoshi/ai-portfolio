@@ -5,7 +5,7 @@
  *
  * To add a topic: add an entry to `topics` (patterns are tested in order, first match wins).
  */
-import { education, experience, profile, projects, publications, skills } from "./profile";
+import { education, experience, interests, profile, projects, publications, skills } from "./profile";
 
 export type CardKind =
   | "about"
@@ -16,12 +16,27 @@ export type CardKind =
   | "education"
   | "contact"
   | "resume"
-  | "role";
+  | "role"
+  | "interests";
 
 /* `focus` opens one role in the experience card (index into `experience`). */
 export type Answer = { text: string; card?: CardKind; focus?: number; followUps: string[] };
 
-type Topic = { match: RegExp; answer: () => Answer };
+/* `answer` receives the lower-cased question, for topics that tailor the reply to it. */
+type Topic = { match: RegExp; answer: (q: string) => Answer };
+
+const interestList = (() => {
+  const names = interests.map((i) => i.name.toLowerCase());
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+})();
+
+/* Which interest a question names, if any ("do you play chess?" -> Chess). */
+const interestWords: [RegExp, string][] = [
+  [/cricket/, "Cricket"],
+  [/chess/, "Chess"],
+  [/cook|food|recipe|kitchen/, "Cooking"],
+  [/music|song|listen/, "Listening to music"],
+];
 
 const [amity, plancover, aapki, cognizant] = experience;
 const [insight, fer, sentiment] = projects;
@@ -37,7 +52,26 @@ const topics: Topic[] = [
     }),
   },
   {
-    match: /(hobb|free time|spare time|weekend|fun fact|salary|\bctc\b|compensation|expected pay|how old|\bage\b|married|family|birthday|religion|favou?rite)/,
+    // "research interests" belongs to the research topic, not hobbies
+    match: /(hobb|(?<!research )interests\b|free time|spare time|weekend|for fun|\bfun\b|outside (of )?work|pastime|passion|cricket|chess|cook|music|\bsongs?\b|\bsports?\b|\bplay\b)/,
+    answer: (q) => {
+      const named = interestWords.find(([re]) => re.test(q))?.[1];
+      // "which / what kind / favourite ..." asks for specifics that aren't on the site
+      const wantsDetail = /(favou?rite|which|what kind|what type|what sort|\bwho\b|\bbest\b)/.test(q);
+      return {
+        text:
+          named && wantsDetail
+            ? `**${named}** is one of my interests, but I haven't shared the details here. Ask me over email and I'm happy to talk about it!`
+            : named
+              ? `Yes! **${named}** is one of my interests. Outside work I enjoy ${interestList}.`
+              : `Outside work I enjoy **${interestList}**.`,
+        card: "interests",
+        followUps: ["What do you do?", "What projects have you built?"],
+      };
+    },
+  },
+  {
+    match: /(fun fact|salary|\bctc\b|compensation|expected pay|how old|\bage\b|married|family|birthday|religion|favou?rite)/,
     answer: () => ({
       text: "That isn't something I've put on my resume, so I'd rather answer it personally. Drop me an email and I'm happy to chat.",
       card: "contact",
@@ -240,7 +274,7 @@ const topics: Topic[] = [
     }),
   },
   {
-    match: /(\bwho\b|\bname\b|about|yourself|introduce|hello|\bhi\b|\bhey\b|focus|background|summary|tell me)/,
+    match: /(\bwho\b|\bname\b|about|yourself|introduce|hello|\bhi\b|\bhey\b|focus|background|summary|tell me|interest(ed|s)? (you|in)|passionate)/,
     answer: () => ({
       text: `Hi, I'm **${profile.name}**, an AI Engineer and researcher based in ${profile.location}. ${profile.summary.replace(/^AI Engineer with/, "I have")}`,
       card: "about",
@@ -337,9 +371,9 @@ export function answer(question: string): Answer {
     const t = techAnswer(tech[1]);
     if (t) return t;
     const term = tech[1].toLowerCase();
-    for (const topic of topics) if (topic.match.test(term)) return topic.answer();
+    for (const topic of topics) if (topic.match.test(term)) return topic.answer(term);
   }
-  for (const t of topics) if (t.match.test(q)) return t.answer();
+  for (const t of topics) if (t.match.test(q)) return t.answer(q);
   return {
     text: "I can only answer from my resume, and I couldn't find that in it. Try asking about my experience, projects, skills, research, education or how to contact me.",
     followUps: ["Who are you?", "What projects have you built?", "What research have you published?"],

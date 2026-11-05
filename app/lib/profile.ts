@@ -1,7 +1,8 @@
 /*
  * Single source of truth for everything the site says about Ishan.
- * Every fact here comes from Resume/Ishan_Joshi_AI_Engineer_Resume.pdf. Update the resume first,
- * then mirror the change here; never add facts that are not in the resume.
+ * Every fact here comes from Resume/Ishan_Joshi_AI_Engineer_Resume.pdf, except `interests`, which
+ * Ishan provided directly. Update the resume first, then mirror the change here; never add facts
+ * that are not in the resume or given by Ishan.
  */
 
 export const profile = {
@@ -275,6 +276,14 @@ export const education = [
     end: "Jun 2020",
     grade: "CGPA 8.36",
   },
+];
+
+/* Interests outside work. Not on the resume: provided directly by Ishan. Keep to what he listed. */
+export const interests = [
+  { name: "Cricket", emoji: "🏏", color: "#3E9858" },
+  { name: "Chess", emoji: "♟️", color: "#856ED9" },
+  { name: "Cooking", emoji: "🍳", color: "#D97706" },
+  { name: "Listening to music", emoji: "🎧", color: "#0171E3" },
 ];
 
 export const certifications = [
