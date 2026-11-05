@@ -9,7 +9,7 @@ import Portrait from "../Portrait";
 import ProjectCards from "../ProjectCards";
 import PublicationList from "../PublicationList";
 import type { CardKind } from "../lib/assistant";
-import { certifications, education, experience, highlights, profile, skills } from "../lib/profile";
+import { certifications, education, experience, highlights, instagramHandle, links, profile, skills } from "../lib/profile";
 
 const shell = "rounded-3xl border border-border bg-card p-5 backdrop-blur-lg";
 
@@ -38,6 +38,29 @@ function AboutCard({ photo }: { photo?: string | null }) {
         Read the full profile <Icon name="arrow-right" className="h-3.5 w-3.5" />
       </Link>
     </div>
+  );
+}
+
+/* Where personal questions go: a link to Instagram. */
+function InstagramCard() {
+  return (
+    <a
+      href={links.instagram}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`${shell} group flex items-center gap-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/5`}
+    >
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#FEDA75] via-[#D62976] to-[#4F5BD5] text-white shadow-lg shadow-[#D62976]/25 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+        <Icon name="instagram" className="h-6 w-6" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-semibold">{instagramHandle}</span>
+        <span className="block text-sm text-muted">Personal questions? Let&apos;s chat on Instagram.</span>
+      </span>
+      <span className="flex shrink-0 items-center gap-1 rounded-full bg-foreground px-3.5 py-2 text-sm font-medium text-background transition-transform group-hover:translate-x-0.5">
+        Connect <Icon name="arrow-up-right" className="h-3.5 w-3.5" />
+      </span>
+    </a>
   );
 }
 
@@ -222,6 +245,8 @@ export default function ChatCard({ kind, photo, focus }: { kind: CardKind; photo
       return <AboutCard photo={photo} />;
     case "role":
       return <RoleCard />;
+    case "instagram":
+      return <InstagramCard />;
     case "interests":
       return (
         <div className="rounded-3xl border border-border bg-card p-4 backdrop-blur-lg">

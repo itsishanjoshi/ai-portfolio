@@ -64,6 +64,7 @@ export default function About() {
                 { href: links.linkedin, icon: "linkedin" as const, label: "LinkedIn" },
                 { href: links.github, icon: "github" as const, label: "GitHub" },
                 { href: links.scholar, icon: "scholar" as const, label: "Google Scholar" },
+                { href: links.instagram, icon: "instagram" as const, label: "Instagram" },
               ].map((l) => (
                 <a
                   key={l.label}

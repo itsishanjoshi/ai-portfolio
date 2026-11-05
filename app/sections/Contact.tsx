@@ -10,7 +10,7 @@ export default function Contact() {
         color="#C19433"
         eyebrow="Contact"
         title="Let's build something."
-        intro="Reach me by email, or find me on LinkedIn, GitHub and Google Scholar."
+        intro="Reach me by email, or find me on LinkedIn, GitHub and Google Scholar. For anything personal, say hi on Instagram."
       />
       <Reveal>
         <ContactCard />

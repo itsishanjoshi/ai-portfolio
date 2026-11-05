@@ -18,6 +18,9 @@ export default function Footer() {
           <a href={links.scholar} target="_blank" rel="noopener noreferrer" aria-label="Google Scholar" className="transition-colors hover:text-foreground">
             <Icon name="scholar" className="h-4 w-4" />
           </a>
+          <a href={links.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="transition-colors hover:text-foreground">
+            <Icon name="instagram" className="h-4 w-4" />
+          </a>
           <a href={links.email} aria-label="Email" className="transition-colors hover:text-foreground">
             <Icon name="mail" className="h-4 w-4" />
           </a>

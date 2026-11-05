@@ -8,6 +8,7 @@ const channels: { label: string; value: string; href: string; icon: IconName }[]
   { label: "LinkedIn", value: "ishan-joshi", href: links.linkedin, icon: "linkedin" },
   { label: "GitHub", value: "itsishanjoshi", href: links.github, icon: "github" },
   { label: "Google Scholar", value: "Publications", href: links.scholar, icon: "scholar" },
+  { label: "Instagram", value: "ishanjoshi_007", href: links.instagram, icon: "instagram" },
 ];
 
 /* Email (with copy), social links and resume download. Used on the page and in the chat. */
@@ -46,7 +47,7 @@ export default function ContactCard({ compact = false }: { compact?: boolean }) 
         </button>
       </div>
 
-      <div className={`grid gap-3 sm:grid-cols-2 ${compact ? "mt-4" : "mt-8 lg:grid-cols-4"}`}>
+      <div className={`grid gap-3 sm:grid-cols-2 ${compact ? "mt-4" : "mt-8 lg:grid-cols-5"}`}>
         {channels.map((c) => (
           <a
             key={c.label}

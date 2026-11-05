@@ -5,7 +5,7 @@
  *
  * To add a topic: add an entry to `topics` (patterns are tested in order, first match wins).
  */
-import { education, experience, interests, profile, projects, publications, skills } from "./profile";
+import { education, experience, instagramHandle, interests, profile, projects, publications, skills } from "./profile";
 
 export type CardKind =
   | "about"
@@ -17,7 +17,8 @@ export type CardKind =
   | "contact"
   | "resume"
   | "role"
-  | "interests";
+  | "interests"
+  | "instagram";
 
 /* `focus` opens one role in the experience card (index into `experience`). */
 export type Answer = { text: string; card?: CardKind; focus?: number; followUps: string[] };
@@ -61,21 +62,39 @@ const topics: Topic[] = [
       return {
         text:
           named && wantsDetail
-            ? `**${named}** is one of my interests, but I haven't shared the details here. Ask me over email and I'm happy to talk about it!`
+            ? `**${named}** is one of my interests! For the details, connect with me on **Instagram (${instagramHandle})** and I'm happy to talk about it there.`
             : named
               ? `Yes! **${named}** is one of my interests. Outside work I enjoy ${interestList}.`
               : `Outside work I enjoy **${interestList}**.`,
-        card: "interests",
+        card: named && wantsDetail ? "instagram" : "interests",
         followUps: ["What do you do?", "What projects have you built?"],
       };
     },
   },
   {
-    match: /(fun fact|salary|\bctc\b|compensation|expected pay|how old|\bage\b|married|family|birthday|religion|favou?rite)/,
+    match: /(instagram|\binsta\b)/,
     answer: () => ({
-      text: "That isn't something I've put on my resume, so I'd rather answer it personally. Drop me an email and I'm happy to chat.",
+      text: `Yes! I'm **${instagramHandle}** on Instagram. That's the best place to reach me for anything personal.`,
+      card: "instagram",
+      followUps: ["What do you do for fun?", "How can I contact you?"],
+    }),
+  },
+  {
+    // personal questions go to Instagram
+    match: /(personal|fun fact|how old|\bage\b|\bdob\b|birthday|born|married|marriage|single|relationship|girlfriend|boyfriend|wife|husband|partner|kids|children|family|parents|siblings|religion|zodiac|hometown|grew up|favou?rite|travel|movies?|films?|books?|\bpets?\b|\bdogs?\b|\bcats?\b|\bgym\b|fitness|diet|vegetarian|weekend plans)/,
+    answer: () => ({
+      text: `That's a more personal question. I keep this site about my work, so for personal stuff, connect with me on **Instagram (${instagramHandle})** and I'm happy to chat there!`,
+      card: "instagram",
+      followUps: ["What do you do for fun?", "What do you do?"],
+    }),
+  },
+  {
+    // salary and similar are professional: email
+    match: /(salary|\bctc\b|compensation|expected pay|pay expectation)/,
+    answer: () => ({
+      text: `I'd rather discuss that directly. Drop me an email at **${profile.email}** and I'm happy to talk.`,
       card: "contact",
-      followUps: ["What do you do?", "What projects have you built?"],
+      followUps: ["What do you do?", "Can I see your resume?"],
     }),
   },
   {

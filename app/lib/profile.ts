@@ -33,7 +33,11 @@ export const links = {
   linkedin: "https://www.linkedin.com/in/ishan-joshi-755326147/",
   github: "https://github.com/itsishanjoshi",
   scholar: "https://scholar.google.com/citations?user=tuT3OagAAAAJ&hl=en",
+  // provided by Ishan (not on the resume); the place to send personal questions
+  instagram: "https://www.instagram.com/ishanjoshi_007/",
 };
+
+export const instagramHandle = "@ishanjoshi_007";
 
 /* Figures that appear in the resume, used as quick highlights. */
 export const highlights = [
