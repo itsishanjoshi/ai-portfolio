@@ -19,9 +19,9 @@ export const metadata: Metadata = {
     siteName: `${profile.name} Portfolio`,
     type: "website",
     locale: "en_IN",
-    images: [{ url: "/avatar-head.png", width: 320, height: 320, alt: profile.name }],
+    images: [{ url: "/profile.jpg", width: 400, height: 400, alt: profile.name }],
   },
-  twitter: { card: "summary", title: `${profile.name} · AI Engineer`, description: profile.tagline, images: ["/avatar-head.png"] },
+  twitter: { card: "summary", title: `${profile.name} · AI Engineer`, description: profile.tagline, images: ["/profile.jpg"] },
 };
 
 export const viewport: Viewport = {

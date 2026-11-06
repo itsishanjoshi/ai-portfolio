@@ -25,8 +25,8 @@ npm run build && npm start
 | File | Used for |
 |---|---|
 | `public/avatar-full.png` | Full-body Bitmoji in the hero (transparent PNG) |
-| `public/avatar-head.png` | Round avatar in the nav, chat, and as the link-preview image |
-| `public/profile.jpg` (optional) | Your real photo. If present, it replaces the Bitmoji head in the About card and the chat's profile card. `.png`/`.webp` also work. Rebuild after adding it. |
+| `public/profile.jpg` | Close-up photo: round avatars in the nav and chat, the About card, and the link-preview image |
+| `public/my_pic.jpeg` | Full photo beside the summary in About |
 
 `assets-src/avatar-source.jpeg` is the original Snapchat screenshot the Bitmoji was cut from. It's kept outside
 `public/` on purpose because it shows a username and QR code.

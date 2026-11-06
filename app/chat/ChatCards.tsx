@@ -13,11 +13,11 @@ import { certifications, education, experience, highlights, instagramHandle, lin
 
 const shell = "rounded-3xl border border-border bg-card p-5 backdrop-blur-lg";
 
-function AboutCard({ photo }: { photo?: string | null }) {
+function AboutCard() {
   return (
     <div className={shell}>
       <div className="flex items-center gap-4">
-        <Portrait size={56} src={photo ?? undefined} />
+        <Portrait size={56} />
         <div className="min-w-0">
           <div className="text-lg font-semibold">{profile.name}</div>
           <div className="text-sm text-muted">{profile.headline}</div>
@@ -239,10 +239,10 @@ function ResumeCard() {
   );
 }
 
-export default function ChatCard({ kind, photo, focus }: { kind: CardKind; photo?: string | null; focus?: number }) {
+export default function ChatCard({ kind, focus }: { kind: CardKind; focus?: number }) {
   switch (kind) {
     case "about":
-      return <AboutCard photo={photo} />;
+      return <AboutCard />;
     case "role":
       return <RoleCard />;
     case "instagram":

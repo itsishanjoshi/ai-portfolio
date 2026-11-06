@@ -45,7 +45,7 @@ const WORD_MS = 28; // delay between streamed words
 const MAX_STREAM_MS = 1000; // long answers reveal several words per tick to finish within this
 const THINK_MS = 200; // "typing…" pause before the answer starts
 
-export default function ChatView({ initialQuery, photo }: { initialQuery?: string; photo?: string | null }) {
+export default function ChatView({ initialQuery }: { initialQuery?: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [drawer, setDrawer] = useState(false);
   const nextId = useRef(1);
@@ -215,7 +215,7 @@ export default function ChatView({ initialQuery, photo }: { initialQuery?: strin
                       <>
                         {m.card && (
                           <div className="animate-fade-up" style={{ animationDuration: "0.6s" }}>
-                            <ChatCard kind={m.card} photo={photo} focus={m.focus} />
+                            <ChatCard kind={m.card} focus={m.focus} />
                           </div>
                         )}
                         {m.id === lastId && (

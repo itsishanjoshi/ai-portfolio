@@ -1,13 +1,12 @@
+import Image from "next/image";
 import Icon from "../Icons";
 import Reveal from "../Reveal";
 import SectionHeading from "../SectionHeading";
 import InterestTiles from "../InterestTiles";
 import Portrait from "../Portrait";
-import { getProfilePhoto } from "../lib/photo";
 import { highlights, links, profile } from "../lib/profile";
 
 export default function About() {
-  const photo = getProfilePhoto();
   return (
     <section id="about" className="mx-auto max-w-6xl px-4 py-24 md:px-8 md:py-32">
       <SectionHeading
@@ -21,6 +20,14 @@ export default function About() {
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
         <Reveal>
           <div className="h-full rounded-3xl border border-border bg-card p-6 backdrop-blur-lg md:p-9">
+            <Image
+              src="/my_pic.jpeg"
+              alt="Ishan Joshi in a dark suit"
+              width={302}
+              height={368}
+              sizes="(min-width: 768px) 192px, 112px"
+              className="float-right mb-2 ml-4 w-28 rounded-2xl border border-border md:mb-3 md:ml-7 md:w-48"
+            />
             <p className="text-lg leading-relaxed text-foreground/90 md:text-xl">{profile.summary}</p>
             <div className="mt-7 flex flex-wrap gap-2">
               {profile.focus.map((f) => (
@@ -35,7 +42,7 @@ export default function About() {
         <Reveal delay={120}>
           <div className="flex h-full flex-col rounded-3xl border border-border bg-card p-6 backdrop-blur-lg md:p-8">
             <div className="flex items-center gap-4">
-              <Portrait size={64} src={photo ?? undefined} />
+              <Portrait size={64} />
               <div>
                 <div className="text-lg font-semibold">{profile.name}</div>
                 <div className="text-sm text-muted">{profile.role} · M.Tech Data Science</div>

@@ -1,17 +1,14 @@
 import Image from "next/image";
 
 /*
- * Round portrait used for small avatars (chat, about card).
- * `src` defaults to the Bitmoji head; pass "/profile.jpg" to show the real photo.
+ * Round close-up used for small avatars (nav, chat, about card).
  */
 export default function Portrait({
   size = 40,
-  src = "/avatar-head.png",
   ring = true,
   className = "",
 }: {
   size?: number;
-  src?: string;
   ring?: boolean;
   className?: string;
 }) {
@@ -22,7 +19,14 @@ export default function Portrait({
       } ${className}`}
       style={{ width: size, height: size }}
     >
-      <Image src={src} alt="Ishan Joshi" width={size * 2} height={size * 2} className="h-full w-full object-cover" />
+      {/* zoomed on the face so it still reads at 32px */}
+      <Image
+        src="/profile.jpg"
+        alt="Ishan Joshi"
+        width={size * 4}
+        height={size * 4}
+        className="h-full w-full origin-[50%_28%] scale-[1.7] object-cover"
+      />
     </span>
   );
 }
