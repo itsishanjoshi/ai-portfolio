@@ -10,7 +10,7 @@ export default function Projects() {
         color="#0171E3"
         eyebrow="Projects"
         title="Things I've built."
-        intro="NLP, computer vision and classification work. Open a card for the full write-up."
+        intro="LLM systems, NLP and computer vision work. Open a card for the full write-up."
       />
       <Reveal>
         <ProjectCards />

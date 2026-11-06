@@ -1,8 +1,8 @@
 /*
  * Single source of truth for everything the site says about Ishan.
- * Every fact here comes from Resume/Ishan_Joshi_AI_Engineer_Resume.pdf, except `interests`, which
- * Ishan provided directly. Update the resume first, then mirror the change here; never add facts
- * that are not in the resume or given by Ishan.
+ * Facts come from Resume/Ishan_Joshi_AI_Engineer_Resume.pdf, except `interests`, which Ishan provided
+ * directly, and project results, which come from his project notebooks. Update the resume first, then
+ * mirror the change here; never add facts that are not in the resume or given by Ishan.
  */
 
 export const profile = {
@@ -172,12 +172,30 @@ export type Project = {
   stack: string[];
   /* Two colours for the card's generated cover art. */
   palette: [string, string];
+  /* Measured outcomes, shown in the write-up. Only real figures. */
+  results?: { value: string; label: string }[];
+  /* Public links only: a private repo would be a 404 for visitors. */
+  links?: { label: string; href: string }[];
 };
 
 export const projects: Project[] = [
   {
+    id: "clinical-platform",
+    title: "Multi-Agent Clinical Decision-Support Platform",
+    category: "LLM · Multi-agent · MLOps",
+    blurb:
+      "A multi-agent LLM platform for clinical decision support, built with Ollama and Docker and hosted on an NVIDIA DGX A100.",
+    points: [
+      "Engineered and hosted a multi-agent clinical decision-support platform using Ollama and Docker on an NVIDIA DGX A100 MIG 7g.40gb partition.",
+      "Maintained 99%+ uptime while optimizing VRAM utilization.",
+    ],
+    stack: ["Multi-agent AI", "Ollama", "Docker", "NVIDIA DGX A100", "MIG"],
+    palette: ["#3E9858", "#0171E3"],
+    results: [{ value: "99%+", label: "uptime" }],
+  },
+  {
     id: "insight-extraction",
-    title: "LLM-Driven Workflow for Competitive Insight Extraction",
+    title: "NLP Workflow for Competitive Insight Extraction",
     category: "NLP · Analytics",
     blurb:
       "An NLP pipeline that reads KPMG and PwC research reports and organizes what they say into Finance, Technology, and ESG themes.",
@@ -185,8 +203,12 @@ export const projects: Project[] = [
       "Built an NLP analytics pipeline using MiniLM sentence embeddings and K-Means clustering to extract and organize insights from KPMG and PwC research reports.",
       "Mapped clustered content to Finance, Technology, and ESG domains for competitive benchmarking and surfaced results through interactive sunburst and similarity visualizations.",
     ],
-    stack: ["MiniLM", "Sentence embeddings", "K-Means", "Python", "Interactive visualization"],
+    stack: ["MiniLM", "Sentence embeddings", "K-Means", "KeyBERT", "Python", "Dash", "Plotly", "Interactive visualization"],
     palette: ["#856ED9", "#0171E3"],
+    results: [
+      { value: "110", label: "articles analyzed" },
+      { value: "8", label: "topic clusters" },
+    ],
   },
   {
     id: "fer",
@@ -197,9 +219,16 @@ export const projects: Project[] = [
     points: [
       "Implemented VGG-16 and ResNet-50 models on FER-2013 for facial-emotion classification, applying normalization, resizing, augmentation, and comparative model evaluation.",
       "Assessed accuracy versus computational cost to identify a model suitable for real-time inference.",
+      "Reached 69.1% test accuracy with ResNet-50 on FER-2013's seven emotion classes.",
+      "Later expanded this work into a multimodal text and audio model using BERT and CNNs, published at ICCCNet 2025.",
     ],
     stack: ["VGG-16", "ResNet-50", "FER-2013", "Transfer learning", "Data augmentation"],
     palette: ["#329696", "#3E9858"],
+    results: [{ value: "69.1%", label: "test accuracy (ResNet-50)" }],
+    links: [
+      { label: "Code on GitHub", href: "https://github.com/itsishanjoshi/Emotion" },
+      { label: "Multimodal follow-up paper", href: "https://link.springer.com/chapter/10.1007/978-3-032-18910-3_19" },
+    ],
   },
   {
     id: "sentiment",
@@ -236,7 +265,7 @@ export const publications: Publication[] = [
     url: "https://link.springer.com/chapter/10.1007/978-3-032-18910-3_19",
     publisher: "Springer",
     summary:
-      "Developed a multimodal model combining BERT text representations and CNN-based mel-spectrogram features with cross-modal attention and fusion.",
+      "Developed a multimodal model combining BERT text representations and CNN-based mel-spectrogram features with cross-modal attention and fusion. Achieved 65.45% test accuracy and 65.86% weighted F1 across five emotions on the MELD dataset.",
     tags: ["Multimodal AI", "BERT", "CNN", "Cross-modal attention"],
   },
   {

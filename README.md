@@ -42,7 +42,7 @@ key, so it can't make anything up. Unknown questions get an "I can only answer f
 
 ## Deploying
 
-Works on Vercel as-is. Set `NEXT_PUBLIC_SITE_URL` (for example `https://ishanjoshi.dev`) so share previews,
-`robots.txt` and `sitemap.xml` use the real domain.
+Works on Vercel as-is: share previews, `robots.txt` and `sitemap.xml` use the project's production domain.
+Set `NEXT_PUBLIC_SITE_URL` (for example `https://ishanjoshi.dev`) only to override it with a custom domain.
 
 Tailwind is pinned to 4.2.1 because newer 4.x releases need Node 20.19+; unpin it once Node is upgraded.

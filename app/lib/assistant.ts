@@ -26,6 +26,9 @@ export type Answer = { text: string; card?: CardKind; focus?: number; followUps:
 /* `answer` receives the lower-cased question, for topics that tailor the reply to it. */
 type Topic = { match: RegExp; answer: (q: string) => Answer };
 
+const THANKS = /^\s*(thanks|thank you|thx|ty|cool|great|nice|awesome|ok|okay|got it)(\s+(a lot|so much|very much|again|you))*[\s.!]*$/;
+const LEADING_FILLER = /^\s*(?:(?:thanks|thank you|thx|ty|cool|great|nice|awesome|ok|okay|got it|alright|so|and)\b[\s,.!:-]*)+/i;
+
 const interestList = (() => {
   const names = interests.map((i) => i.name.toLowerCase());
   return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
@@ -40,13 +43,16 @@ const interestWords: [RegExp, string][] = [
 ];
 
 const [amity, plancover, aapki, cognizant] = experience;
-const [insight, fer, sentiment] = projects;
+const [, insight, fer, sentiment] = projects;
 const [pubEmotion, pubSleep, pubWatermark] = publications;
 const [mtech, btech] = education;
 
+const clinicalText = `At ${amity.org} I engineered and host a **multi-agent clinical decision-support platform** built with Ollama and Docker. It runs on an NVIDIA DGX A100 **MIG 7g.40gb** partition, and I've kept it at **99%+ uptime** while optimizing VRAM utilization.`;
+
 const topics: Topic[] = [
   {
-    match: /^\s*(thanks|thank you|thx|ty|cool|great|nice|awesome|ok|okay|got it)\b/,
+    // only a message that is nothing but thanks; "ok, what's your email?" is a real question
+    match: THANKS,
     answer: () => ({
       text: "You're welcome! Anything else you'd like to know about my work?",
       followUps: ["What projects have you built?", "What research have you published?", "How can I contact you?"],
@@ -54,7 +60,7 @@ const topics: Topic[] = [
   },
   {
     // "research interests" belongs to the research topic, not hobbies
-    match: /(hobb|(?<!research )interests\b|free time|spare time|weekend|for fun|\bfun\b|outside (of )?work|pastime|passion|cricket|chess|cook|music|\bsongs?\b|\bsports?\b|\bplay\b)/,
+    match: /(hobb|(?<!research )interests\b|free time|spare time|weekend|for fun|\bfun\b|outside (of )?work|pastime|passion|cricket|chess|\bcook|music|\bsongs?\b|\bsports?\b|\bdo you play\b)/,
     answer: (q) => {
       const named = interestWords.find(([re]) => re.test(q))?.[1];
       // "which / what kind / favourite ..." asks for specifics that aren't on the site
@@ -80,8 +86,87 @@ const topics: Topic[] = [
     }),
   },
   {
+    match: /\b(this|the) (web)?site\b|\bthis (chat|chatbot|bot|portfolio|page|assistant)\b|\bare you (a |an )?(real |actual |really )*(ai|bot|robot|human|person|llm|chatbot|chatgpt|gpt)\b/,
+    answer: () => ({
+      text: "This site is built with **Next.js, React and Tailwind CSS**. The chat isn't an LLM: it matches your question to a topic and replies with answers written from my resume, so it only says what's in there.",
+      followUps: ["What are your skills?", "What projects have you built?"],
+    }),
+  },
+  {
+    match: /\b(switch\w*|moved?|transition\w*|shift\w*|chang\w*|pivot\w*)\b.*\b(ai|data|ml|tech|career|civil)\b|career (change|switch|path)|from civil/,
+    answer: () => ({
+      text: `I started with a **${btech.degree}**, then moved through front-end work at Cognizant, data-driven content at ${aapki.org} and pricing analytics at ${plancover.org}. An **${mtech.degree}** took me into AI, and I've been an ${amity.role} since ${amity.start}.`,
+      card: "experience",
+      followUps: ["What do you do at Amity University?", "What did you study?"],
+    }),
+  },
+  {
+    match: /\bwhy\b.*\b(leave|leaving|left|quit)\b|reason for leaving/,
+    answer: () => ({
+      text: `I'd rather discuss that directly. Drop me an email at **${profile.email}** and I'm happy to talk.`,
+      card: "contact",
+      followUps: ["Where have you worked?", "What do you do?"],
+    }),
+  },
+  {
+    match: /\b(book|schedule|set up|arrange)\b.*\b(call|meeting|chat|interview|time|slot)\b|\b(meeting|interview)\b|\bcan (we|i) meet\b/,
+    answer: () => ({
+      text: `The easiest way to set up a call is email: **${profile.email}**. Let me know what you'd like to talk about.`,
+      card: "contact",
+      followUps: ["Can I see your resume?", "Where have you worked?"],
+    }),
+  },
+  {
+    match: /(open to|available|availability|opportunit|freelance|relocat|notice period|\bremote\b|(willing|able|ready) to travel|travel for work|looking for|next (role|step|job))/,
+    answer: () => ({
+      text: `I'm currently an AI Engineer at ${amity.org}. For opportunities or questions about availability, the best way to reach me is email: **${profile.email}**.`,
+      card: "contact",
+      followUps: ["What do you do?", "Can I see your resume?"],
+    }),
+  },
+  {
+    match: /(challeng|hardest|difficult|\btough\b|problems? (did|have) you)/,
+    answer: () => ({
+      text: `Two from my current role: keeping a **multi-agent clinical platform** at **99%+ uptime** while optimizing VRAM on a single MIG partition, and reducing unresponsive pods across **30+ concurrent AI workloads**, which I tackled with Grafana monitoring and automated fault recovery.`,
+      card: "role",
+      followUps: ["Tell me about the clinical decision-support platform", "How do you manage the DGX A100 servers?"],
+    }),
+  },
+  {
+    match: /(favou?rite|best|biggest|proudest|main|top|most \w+) (\w+ )?(project|work|achievement|accomplishment|build|thing)|proud(est)? of|\bachievements?\b|accomplish|shipped/,
+    answer: () => ({
+      text: `The one I'd point to first is my multi-agent clinical platform. ${clinicalText}`,
+      card: "projects",
+      followUps: ["How do you manage the DGX A100 servers?", "What research have you published?"],
+    }),
+  },
+  {
+    match: /favou?rite.*(language|framework|tool|stack|library|model)/,
+    answer: () => ({
+      text: "Most of my work is in **Python**, with **PyTorch** and **TensorFlow** for models and **Docker** and **Kubernetes** to deploy them.",
+      card: "skills",
+      followUps: ["What projects have you built?", "What are your skills?"],
+    }),
+  },
+  {
+    match: /\b(how (much|long)|how many years|years? of)\b.*\b(experience|working)\b/,
+    answer: () => ({
+      text: `I've been working since **${cognizant.start}**, across four roles, and I've been an **${amity.role}** at ${amity.org} since ${amity.start}.`,
+      card: "experience",
+      followUps: ["What do you do at Amity University?", "What projects have you built?"],
+    }),
+  },
+  {
+    match: /(github|source code|\byour code\b|\brepos?\b|repositor|code samples?)/,
+    answer: () => ({
+      text: "You'll find my code on **GitHub**. The link is on the card below, along with LinkedIn and Google Scholar.",
+      card: "contact",
+      followUps: ["What projects have you built?", "What research have you published?"],
+    }),
+  },
+  {
     // personal questions go to Instagram
-    match: /(personal|fun fact|how old|\bage\b|\bdob\b|birthday|born|married|marriage|single|relationship|girlfriend|boyfriend|wife|husband|partner|kids|children|family|parents|siblings|religion|zodiac|hometown|grew up|favou?rite|travel|movies?|films?|books?|\bpets?\b|\bdogs?\b|\bcats?\b|\bgym\b|fitness|diet|vegetarian|weekend plans)/,
+    match: /(personal(?! (projects?|work|website|site|portfolio))|fun fact|how old|\bage\b|\bdob\b|birthday|\bborn\b|married|marriage|\bsingle\b|relationship|girlfriend|boyfriend|wife|husband|\b(your|a|life) partner\b|kids|children|family|parents|siblings|religion|zodiac|hometown|grew up|favou?rite|\btravel|movies?|films?|\bbooks?\b|\bpets?\b|\bdogs?\b|\bcats?\b|\bgym\b|fitness|diet|vegetarian|weekend plans)/,
     answer: () => ({
       text: `That's a more personal question. I keep this site about my work, so for personal stuff, connect with me on **Instagram (${instagramHandle})** and I'm happy to chat there!`,
       card: "instagram",
@@ -114,14 +199,6 @@ const topics: Topic[] = [
     }),
   },
   {
-    match: /(open to|available|availability|opportunit|freelance|relocat|notice period)/,
-    answer: () => ({
-      text: `I'm currently an AI Engineer at ${amity.org}. For opportunities or questions about availability, the best way to reach me is email: **${profile.email}**.`,
-      card: "contact",
-      followUps: ["What do you do?", "Can I see your resume?"],
-    }),
-  },
-  {
     match: /\b(certif\w*|course|courses|udemy|iit delhi)\b/,
     answer: () => ({
       text: "I hold four certifications: **AI with Machine Learning** from IIT Delhi, the **NVIDIA Deep Learning Certificate Program**, and two from Udemy, **Power BI Masterclass** and **Machine Learning A-Z: AI, Python & R**.",
@@ -132,8 +209,8 @@ const topics: Topic[] = [
   {
     match: /(clinical|decision[- ]support|multi[- ]?agent|ollama|healthcare|medical)/,
     answer: () => ({
-      text: `At ${amity.org} I engineered and host a **multi-agent clinical decision-support platform** built with Ollama and Docker. It runs on an NVIDIA DGX A100 **MIG 7g.40gb** partition, and I've kept it at **99%+ uptime** while optimizing VRAM utilization.`,
-      card: "role",
+      text: clinicalText,
+      card: "projects",
       followUps: ["How do you manage the DGX A100 servers?", "What are your skills?"],
     }),
   },
@@ -146,7 +223,7 @@ const topics: Topic[] = [
     }),
   },
   {
-    match: /(sleep)/,
+    match: /sleep (efficien|paper|model|research|predict|study|project)|(paper|research|publication|study|project|model).*\bsleep\b/,
     answer: () => ({
       text: `**${pubSleep.title}** (${pubSleep.venue}, ${pubSleep.publisher}). ${pubSleep.summary}`,
       card: "research",
@@ -162,7 +239,7 @@ const topics: Topic[] = [
     }),
   },
   {
-    match: /(cross-?modal|multi-?modal|bert|audio|spectrogram|emotion.*(paper|research|text)|(paper|research).*emotion)/,
+    match: /(cross-?modal|multi-?modal|\bbert\b|\bmeld\b|audio|spectrogram|emotion.*(paper|research|text)|(paper|research).*emotion)/,
     answer: () => ({
       text: `**${pubEmotion.title}**, published at ${pubEmotion.venue} (${pubEmotion.publisher}). ${pubEmotion.summary}`,
       card: "research",
@@ -170,7 +247,7 @@ const topics: Topic[] = [
     }),
   },
   {
-    match: /(\bfer\b|fer-2013|facial|\bfaces?\b|vgg|resnet|computer vision)/,
+    match: /(\bfer\b|facial|\bfaces\b|face (recognition|emotion|detection)|vgg|resnet|computer vision|\bemotion\b)/,
     answer: () => ({
       text: `**${fer.title}**: ${fer.points.join(" ")}`,
       card: "projects",
@@ -178,7 +255,7 @@ const topics: Topic[] = [
     }),
   },
   {
-    match: /(sentiment|restaurant|review|naive bayes|svm)/,
+    match: /(sentiment|restaurant|reviews? (analysis|classif)|naive bayes|svm)/,
     answer: () => ({
       text: `**${sentiment.title}**: ${sentiment.points.join(" ")}`,
       card: "projects",
@@ -194,7 +271,7 @@ const topics: Topic[] = [
     }),
   },
   {
-    match: /(publi|paper|research|scholar|doi|journal|conference)/,
+    match: /(publi|paper|research|scholar|\bdoi\b|journal|conference)/,
     answer: () => ({
       text: `I have **${publications.length} peer-reviewed publications** from 2025: multimodal emotion recognition with BERT and CNN (Springer, ICCCNet), predictive modelling of sleep efficiency (IEEE, ICETM), and a hybrid approach to digital image watermarking (Springer, CRM2025).`,
       card: "research",
@@ -204,9 +281,9 @@ const topics: Topic[] = [
   {
     match: /(project|built|build|made|portfolio)/,
     answer: () => ({
-      text: `Here are my key projects: an **LLM-driven workflow for competitive insight extraction** from KPMG and PwC reports, **facial emotion recognition** with VGG-16 and ResNet-50, and **restaurant review sentiment analysis**. Tap a card for the details.`,
+      text: `Here are my key projects: a **multi-agent clinical decision-support platform**, an **NLP workflow for competitive insight extraction** from KPMG and PwC reports, **facial emotion recognition** with VGG-16 and ResNet-50, and **restaurant review sentiment analysis**. Tap a card for the details.`,
       card: "projects",
-      followUps: ["Tell me about the clinical decision-support platform", "What are your skills?"],
+      followUps: ["Tell me about the facial emotion recognition project", "What are your skills?"],
     }),
   },
   {
@@ -253,7 +330,7 @@ const topics: Topic[] = [
     }),
   },
   {
-    match: /(amity|\bcurrent\w*|\bnow\b|\btoday\b|\bpresent\b|day job|ai engineer|what do you do|for a living|profession|occupation|working on|position|designation|job title|\bjob\b)/,
+    match: /(amity|\bcurrent\w*|\bnow\b|\btoday\b|\bpresent\b|day job|ai engineer|what do you do|for a living|profession|occupation|working on|\bdoing\b|these days|position|designation|job title|\bjob\b)/,
     answer: () => ({
       text: `Since ${amity.start} I've been an **${amity.role}** at ${amity.org}, ${amity.place}. I run AI research infrastructure on two NVIDIA DGX A100 servers, host a multi-agent clinical decision-support platform, develop models in PyTorch and TensorFlow, and deploy Streamlit AI/LLM apps for industry demos and research workflows.`,
       card: "role",
@@ -285,7 +362,7 @@ const topics: Topic[] = [
     }),
   },
   {
-    match: /(where|location|based|live|city|noida|india)/,
+    match: /(where|location|based|\blive\b|city|noida|india)/,
     answer: () => ({
       text: `I'm based in **${profile.location}**.`,
       card: "contact",
@@ -293,7 +370,7 @@ const topics: Topic[] = [
     }),
   },
   {
-    match: /(\bwho\b|\bname\b|about|yourself|introduce|hello|\bhi\b|\bhey\b|focus|background|summary|tell me|interest(ed|s)? (you|in)|passionate)/,
+    match: /(\bwho\b|\bname\b|about you|yourself|introduce|\bhello+\b|\bhi+\b|\bhey+\b|\byo+\b|namaste|\bmeet you\b|focus|background|summary|tell me more|interest(ed|s)? (you|in)|passionate)/,
     answer: () => ({
       text: `Hi, I'm **${profile.name}**, an AI Engineer and researcher based in ${profile.location}. ${profile.summary.replace(/^AI Engineer with/, "I have")}`,
       card: "about",
@@ -305,7 +382,7 @@ const topics: Topic[] = [
 /* ---------- "Do you know X?" lookups ---------- */
 
 const TECH_QUESTION =
-  /\b(?:do you know|do you use|have you (?:ever )?(?:used|worked with|worked on)|are you familiar with|familiar with|experience (?:with|in)|can you (?:use|code in|work with)|proficient (?:in|with)|skilled in|know how to use)\s+(.+?)[\s?.!]*$/i;
+  /\b(?:do you know|do you use|have you (?:ever )?(?:used|worked with|worked on)|are you familiar with|familiar with|experience (?:do you have )?(?:with|in)|can you (?:use|code in|work with)|proficient (?:in|with)|skilled in|know how to use)\s+(.+?)[\s?.!]*$/i;
 
 /* Short names people type, mapped to how the resume spells them. */
 const aliases: Record<string, string> = {
@@ -383,7 +460,10 @@ function techAnswer(rawTerm: string): Answer | null {
   };
 }
 
-export function answer(question: string): Answer {
+export function answer(rawQuestion: string): Answer {
+  // "ok so what are your projects" is the same question as "what are your projects"
+  const stripped = rawQuestion.replace(LEADING_FILLER, "");
+  const question = stripped.trim() && !THANKS.test(rawQuestion.toLowerCase()) ? stripped : rawQuestion;
   const q = question.toLowerCase();
   const tech = question.trim().match(TECH_QUESTION);
   if (tech) {
