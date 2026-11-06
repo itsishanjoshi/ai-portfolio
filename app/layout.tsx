@@ -3,6 +3,7 @@ import { Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { profile } from "./lib/profile";
 import { siteUrl } from "./lib/site";
+import { themeScript } from "./lib/theme";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
@@ -35,7 +36,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className={`${inter.variable} ${geistMono.variable} min-h-screen font-sans antialiased`}>
         {/* scroll reveals need JavaScript, so without it the sections just show */}
         <noscript>

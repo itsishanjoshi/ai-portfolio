@@ -7,6 +7,7 @@ import Avatar from "../Avatar";
 import Icon from "../Icons";
 import Portrait from "../Portrait";
 import PromptTiles from "../PromptTiles";
+import ThemeToggle from "../ThemeToggle";
 import { answer, type CardKind } from "../lib/assistant";
 import { prefersReducedMotion } from "../lib/motion";
 import { suggestedQuestions } from "../lib/prompts";
@@ -163,6 +164,7 @@ export default function ChatView({ initialQuery }: { initialQuery?: string }) {
               </span>
             </span>
           </div>
+          <ThemeToggle className="flex h-9 w-9 border border-border" />
           <a
             href={profile.resume}
             download

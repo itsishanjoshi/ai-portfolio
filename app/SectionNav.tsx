@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Icon from "./Icons";
 import Portrait from "./Portrait";
+import ThemeToggle from "./ThemeToggle";
 import { prefersReducedMotion } from "./lib/motion";
 import { profile } from "./lib/profile";
 
@@ -125,6 +126,7 @@ export default function SectionNav() {
           <Icon name="chat" className="h-3.5 w-3.5" />
           Ask
         </Link>
+        <ThemeToggle className="hidden h-8 w-8 sm:flex" />
         <a
           href={profile.resume}
           download

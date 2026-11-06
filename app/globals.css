@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
+/* dark: utilities follow the theme set on <html>, which lib/theme.ts chooses before first paint */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /*
  * Design tokens. Neutral zinc palette with one blue accent, glassy white cards and large radii.
- * Dark mode follows the visitor's system setting.
+ * Dark mode follows the visitor's choice, or their system setting until they make one.
  *   bg-background / text-foreground      page
  *   bg-card / border-border              glass cards and hairlines
  *   text-muted                           secondary text
@@ -45,20 +48,18 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #09090b;
-    --foreground: #fafafa;
-    --card: rgb(39 39 42 / 0.45);
-    --card-strong: rgb(39 39 42 / 0.85);
-    --border: rgb(255 255 255 / 0.1);
-    --border-strong: rgb(255 255 255 / 0.18);
-    --muted: #a1a1aa;
-    --subtle: #18181b;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
-    color-scheme: dark;
-  }
+:root[data-theme="dark"] {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: rgb(39 39 42 / 0.45);
+  --card-strong: rgb(39 39 42 / 0.85);
+  --border: rgb(255 255 255 / 0.1);
+  --border-strong: rgb(255 255 255 / 0.18);
+  --muted: #a1a1aa;
+  --subtle: #18181b;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  color-scheme: dark;
 }
 
 html {

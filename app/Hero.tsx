@@ -4,8 +4,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import AskBar from "./AskBar";
 import Avatar from "./Avatar";
+import FluidTrail from "./FluidTrail";
 import Icon from "./Icons";
 import PromptTiles from "./PromptTiles";
+import ThemeToggle from "./ThemeToggle";
 import { prefersReducedMotion } from "./lib/motion";
 import { profile } from "./lib/profile";
 
@@ -52,6 +54,8 @@ export default function Hero() {
       data-loops
       className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-4 pb-16 md:pb-24"
     >
+      <FluidTrail />
+
       {/* giant faded name behind everything */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center overflow-hidden">
         <div
@@ -75,6 +79,9 @@ export default function Hero() {
         </span>
         <Icon name="chevron-right" className="hidden h-4 w-4 transition-transform group-hover:translate-x-0.5 sm:block" />
       </a>
+
+      {/* theme switch, top-right */}
+      <ThemeToggle className="absolute top-6 right-4 z-50 flex h-11 w-11 animate-pop border border-border bg-card backdrop-blur-2xl sm:top-8 sm:right-6" />
 
       <div className="z-10 mt-24 mb-6 flex animate-fade-down flex-col items-center text-center md:mt-4 md:mb-10">
         <a
