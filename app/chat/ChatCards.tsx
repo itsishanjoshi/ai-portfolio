@@ -48,7 +48,7 @@ function InstagramCard() {
       href={links.instagram}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${shell} group flex items-center gap-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/5`}
+      className={`${shell} group flex items-center gap-4 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/5`}
     >
       <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#FEDA75] via-[#D62976] to-[#4F5BD5] text-white shadow-lg shadow-[#D62976]/25 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
         <Icon name="instagram" className="h-6 w-6" />
@@ -223,7 +223,7 @@ function ResumeCard() {
     <a
       href={profile.resume}
       download
-      className={`${shell} group flex items-center gap-4 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/5`}
+      className={`${shell} group flex items-center gap-4 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/5`}
     >
       <span className="flex h-14 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-[10px] font-bold text-red-500">
         PDF

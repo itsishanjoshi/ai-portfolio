@@ -40,7 +40,7 @@ export default function ContactCard({ compact = false }: { compact?: boolean }) 
         <button
           type="button"
           onClick={copy}
-          className="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 self-start rounded-full border border-border px-3.5 py-2 text-sm font-medium transition-all hover:bg-subtle active:scale-95 sm:self-auto"
+          className="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 self-start rounded-full border border-border px-3.5 py-2 text-sm font-medium transition hover:bg-subtle active:scale-95 sm:self-auto"
         >
           <Icon name={copied ? "check" : "copy"} className="h-4 w-4" color={copied ? "#3E9858" : "currentColor"} />
           {copied ? "Copied" : "Copy"}
@@ -54,7 +54,7 @@ export default function ContactCard({ compact = false }: { compact?: boolean }) 
             href={c.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center gap-3 rounded-2xl border border-border bg-background/40 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg hover:shadow-black/5"
+            className="group flex items-center gap-3 rounded-2xl border border-border bg-background/40 p-4 transition duration-300 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg hover:shadow-black/5"
           >
             <Icon name={c.icon} className="h-5 w-5" />
             <span className="min-w-0 flex-1">
@@ -67,7 +67,7 @@ export default function ContactCard({ compact = false }: { compact?: boolean }) 
         <a
           href={profile.resume}
           download
-          className="group flex items-center gap-3 rounded-2xl bg-foreground p-4 text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+          className="group flex items-center gap-3 rounded-2xl bg-foreground p-4 text-background transition duration-300 hover:-translate-y-0.5 hover:shadow-lg"
         >
           <Icon name="download" className="h-5 w-5" />
           <span className="min-w-0 flex-1">

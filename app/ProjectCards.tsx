@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import Icon from "./Icons";
+import Reveal from "./Reveal";
 import { projects, type Project } from "./lib/profile";
 
 /* The lead project: a full-width card on the landing page. */
@@ -70,22 +71,23 @@ function ProjectArt({ project, wide = false, className = "" }: { project: Projec
   );
 }
 
-function ProjectDialog({ project, onClose }: { project: Project | null; onClose: () => void }) {
+/* `project` stays set after closing so the write-up is still there while the dialog fades out. */
+function ProjectDialog({ project, open, onClose }: { project: Project | null; open: boolean; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
-    if (project && !d.open) d.showModal();
-    if (!project && d.open) d.close();
-  }, [project]);
+    if (open && !d.open) d.showModal();
+    if (!open && d.open) d.close();
+  }, [open]);
 
   return (
     <dialog
       ref={ref}
       onClose={onClose}
       onClick={(e) => e.target === ref.current && onClose()}
-      className="m-auto w-[calc(100%-2rem)] max-w-2xl overflow-hidden rounded-3xl border border-border bg-background p-0 text-foreground shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-sm open:animate-pop"
+      className="project-dialog m-auto w-[calc(100%-2rem)] max-w-2xl overflow-hidden rounded-3xl border border-border bg-background p-0 text-foreground shadow-2xl"
     >
       {project && (
         <div className="max-h-[85svh] overflow-y-auto">
@@ -156,7 +158,8 @@ function ProjectDialog({ project, onClose }: { project: Project | null; onClose:
 
 /* Tall "Apple card" style project cards; click one to open its full write-up. */
 export default function ProjectCards({ layout = "grid" }: { layout?: "grid" | "carousel" }) {
-  const [open, setOpen] = useState<Project | null>(null);
+  const [selected, setSelected] = useState<Project | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const wrap =
     layout === "grid"
@@ -168,17 +171,20 @@ export default function ProjectCards({ layout = "grid" }: { layout?: "grid" | "c
       <div className={wrap}>
         {projects.map((p, i) => {
           const featured = layout === "grid" && p.id === FEATURED;
-          return (
+          const card = (
           <button
             key={p.id}
             type="button"
-            onClick={() => setOpen(p)}
+            onClick={() => {
+              setSelected(p);
+              setIsOpen(true);
+            }}
             style={{ animationDelay: `${i * 90}ms` }}
-            className={`group relative cursor-pointer snap-start overflow-hidden rounded-3xl text-left shadow-lg shadow-black/5 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl ${
+            className={`group relative cursor-pointer snap-start overflow-hidden rounded-3xl text-left shadow-lg shadow-black/5 transition duration-500 hover:-translate-y-1.5 hover:shadow-2xl ${
               layout !== "grid"
                 ? "h-80 w-64 shrink-0 animate-fade-up"
                 : featured
-                  ? "aspect-[4/5] w-full sm:col-span-2 sm:aspect-[16/7] lg:col-span-3 lg:aspect-[3/1]"
+                  ? "aspect-[4/5] w-full sm:aspect-[16/7] lg:aspect-[3/1]"
                   : "aspect-[4/5] w-full"
             }`}
           >
@@ -196,7 +202,7 @@ export default function ProjectCards({ layout = "grid" }: { layout?: "grid" | "c
               <h3 className={`mt-2 font-bold tracking-tight ${featured ? "text-2xl sm:max-w-md sm:text-3xl" : layout === "grid" ? "text-2xl" : "text-xl"}`}>{p.title}</h3>
               <div className="mt-auto flex items-end justify-between gap-3">
                 <p
-                  className={`line-clamp-3 text-sm text-white/85 transition-all duration-500 ${
+                  className={`line-clamp-3 text-sm text-white/85 transition duration-500 ${
                     featured ? "sm:max-w-md" : "opacity-0 group-hover:opacity-100 max-lg:opacity-100"
                   }`}
                 >
@@ -209,9 +215,16 @@ export default function ProjectCards({ layout = "grid" }: { layout?: "grid" | "c
             </div>
           </button>
           );
+          return layout === "grid" ? (
+            <Reveal key={p.id} delay={i * 90} className={featured ? "sm:col-span-2 lg:col-span-3" : ""}>
+              {card}
+            </Reveal>
+          ) : (
+            card
+          );
         })}
       </div>
-      <ProjectDialog project={open} onClose={() => setOpen(null)} />
+      <ProjectDialog project={selected} open={isOpen} onClose={() => setIsOpen(false)} />
     </>
   );
 }

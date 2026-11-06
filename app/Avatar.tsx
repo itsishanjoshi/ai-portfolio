@@ -14,21 +14,21 @@ export default function Avatar() {
     <div className="relative h-60 w-56 sm:h-80 sm:w-80" aria-hidden="true">
       {/* glow + orbit behind the figure */}
       <div className="absolute inset-[14%] rounded-full bg-gradient-to-br from-[#0171E3]/30 via-[#856ED9]/25 to-[#329696]/30 blur-2xl" />
-      <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full">
-        <g className="origin-center animate-spin-slow" style={{ transformBox: "fill-box" }}>
-          <circle cx="100" cy="100" r="92" fill="none" stroke="currentColor" strokeOpacity="0.16" strokeDasharray="2 7" strokeWidth="1.5" />
-          <circle cx="192" cy="100" r="3.5" fill="#0171E3" />
-          <circle cx="8" cy="100" r="2.5" fill="#856ED9" />
-        </g>
-        <g
-          className="origin-center animate-spin-slow"
-          style={{ transformBox: "fill-box", animationDirection: "reverse", animationDuration: "28s" }}
-        >
-          <circle cx="100" cy="100" r="78" fill="none" stroke="currentColor" strokeOpacity="0.07" />
-          {nodes.map((n, i) => (
-            <circle key={`n${i}`} cx={n.x} cy={n.y} r={i % 2 ? 2 : 3} fill={i % 2 ? "#329696" : "#856ED9"} fillOpacity="0.6" />
-          ))}
-        </g>
+      {/* each ring is its own <svg> so the rotation runs on the GPU instead of repainting every frame */}
+      <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full animate-spin-slow">
+        <circle cx="100" cy="100" r="92" fill="none" stroke="currentColor" strokeOpacity="0.16" strokeDasharray="2 7" strokeWidth="1.5" />
+        <circle cx="192" cy="100" r="3.5" fill="#0171E3" />
+        <circle cx="8" cy="100" r="2.5" fill="#856ED9" />
+      </svg>
+      <svg
+        viewBox="0 0 200 200"
+        className="absolute inset-0 h-full w-full animate-spin-slow"
+        style={{ animationDirection: "reverse", animationDuration: "28s" }}
+      >
+        <circle cx="100" cy="100" r="78" fill="none" stroke="currentColor" strokeOpacity="0.07" />
+        {nodes.map((n, i) => (
+          <circle key={`n${i}`} cx={n.x} cy={n.y} r={i % 2 ? 2 : 3} fill={i % 2 ? "#329696" : "#856ED9"} fillOpacity="0.6" />
+        ))}
       </svg>
 
       {/* the figure, with a soft ground shadow */}

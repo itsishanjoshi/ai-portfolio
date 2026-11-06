@@ -1,5 +1,4 @@
 import ProjectCards from "../ProjectCards";
-import Reveal from "../Reveal";
 import SectionHeading from "../SectionHeading";
 
 export default function Projects() {
@@ -12,9 +11,7 @@ export default function Projects() {
         title="Things I've built."
         intro="LLM systems, NLP and computer vision work. Open a card for the full write-up."
       />
-      <Reveal>
-        <ProjectCards />
-      </Reveal>
+      <ProjectCards />
     </section>
   );
 }

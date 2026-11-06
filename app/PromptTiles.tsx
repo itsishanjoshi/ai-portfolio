@@ -19,7 +19,7 @@ export default function PromptTiles({
             key={p.label}
             type="button"
             onClick={() => onPick(p.question)}
-            className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-2 text-sm font-medium backdrop-blur-lg transition-all hover:border-border-strong hover:bg-subtle active:scale-95"
+            className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-2 text-sm font-medium backdrop-blur-lg transition hover:border-border-strong hover:bg-subtle active:scale-95"
           >
             <Icon name={p.icon} color={p.color} className="h-4 w-4" />
             {p.label}
@@ -36,8 +36,8 @@ export default function PromptTiles({
           key={p.label}
           type="button"
           onClick={() => onPick(p.question)}
-          style={{ animationDelay: `${450 + i * 70}ms` }}
-          className="group flex aspect-square w-full animate-fade-up cursor-pointer flex-col items-center justify-center gap-1.5 rounded-2xl border border-border bg-card backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-border-strong hover:shadow-xl hover:shadow-black/5 active:scale-95"
+          style={{ animationDelay: `${180 + i * 35}ms`, animationDuration: "0.45s" }}
+          className="group flex aspect-square w-full animate-fade-up cursor-pointer flex-col items-center justify-center gap-1.5 rounded-2xl border border-border bg-card backdrop-blur-lg transition duration-300 hover:-translate-y-1 hover:border-border-strong hover:shadow-xl hover:shadow-black/5 active:scale-95"
         >
           <span className="transition-transform duration-300 group-hover:scale-110">
             <Icon name={p.icon} color={p.color} className="h-[22px] w-[22px]" />

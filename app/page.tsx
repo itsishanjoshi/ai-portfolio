@@ -1,6 +1,7 @@
 import Hero from "./Hero";
 import SectionNav from "./SectionNav";
 import Footer from "./Footer";
+import PauseOffscreen from "./PauseOffscreen";
 import About from "./sections/About";
 import Contact from "./sections/Contact";
 import Education from "./sections/Education";
@@ -29,6 +30,7 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
+      <PauseOffscreen />
     </>
   );
 }

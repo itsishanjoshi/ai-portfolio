@@ -1,19 +1,55 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import AskBar from "./AskBar";
 import Avatar from "./Avatar";
 import Icon from "./Icons";
 import PromptTiles from "./PromptTiles";
+import { prefersReducedMotion } from "./lib/motion";
 import { profile } from "./lib/profile";
 
 export default function Hero() {
   const router = useRouter();
-  const ask = (q: string) => router.push(`/chat?q=${encodeURIComponent(q)}`);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    router.prefetch("/chat");
+    const onScroll = () => {
+      setScrolled(true);
+      window.removeEventListener("scroll", onScroll);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [router]);
+
+  /* The ask bar glides into its place on the chat page; browsers without view transitions just navigate. */
+  const ask = (q: string) => {
+    const url = `/chat?q=${encodeURIComponent(q)}`;
+    if (!("startViewTransition" in document) || prefersReducedMotion()) {
+      router.push(url);
+      return;
+    }
+    document.startViewTransition(
+      () =>
+        new Promise<void>((resolve) => {
+          const done = () => {
+            window.removeEventListener("chat-ready", done);
+            clearTimeout(timeout);
+            resolve();
+          };
+          // never hold the page frozen on a slow navigation
+          const timeout = setTimeout(done, 1500);
+          window.addEventListener("chat-ready", done);
+          router.push(url);
+        }),
+    );
+  };
 
   return (
     <section
       id="top"
+      data-loops
       className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-4 pb-16 md:pb-24"
     >
       {/* giant faded name behind everything */}
@@ -30,8 +66,8 @@ export default function Hero() {
       <a
         href={profile.resume}
         download
-        className="group absolute top-6 left-4 z-50 flex animate-pop items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 backdrop-blur-2xl transition-all duration-300 hover:shadow-xl sm:top-8 sm:left-6"
-        style={{ animationDelay: "900ms" }}
+        className="group absolute top-6 left-4 z-50 flex animate-pop items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 backdrop-blur-2xl transition duration-300 hover:shadow-xl sm:top-8 sm:left-6"
+        style={{ animationDelay: "150ms" }}
       >
         <Icon name="download" className="h-4 w-4 text-accent" />
         <span className="text-sm font-medium">
@@ -44,7 +80,7 @@ export default function Hero() {
         <a
           href="#about"
           aria-label="About Ishan"
-          className="mb-2 rounded-2xl border border-border bg-card p-3 shadow-lg shadow-black/5 backdrop-blur-lg transition-all hover:scale-105 hover:bg-card-strong"
+          className="mb-2 rounded-2xl border border-border bg-card p-3 shadow-lg shadow-black/5 backdrop-blur-lg transition hover:scale-105 hover:bg-card-strong"
         >
           <span className="flex h-6 w-6 items-center justify-center text-sm font-black tracking-tighter md:h-8 md:w-8 md:text-base">
             {profile.initials}
@@ -61,17 +97,19 @@ export default function Hero() {
         <Avatar />
       </div>
 
-      <div className="z-10 mt-4 flex w-full animate-fade-up flex-col items-center" style={{ animationDelay: "250ms" }}>
+      <div className="z-10 mt-4 flex w-full animate-fade-up flex-col items-center" style={{ animationDelay: "100ms", animationDuration: "0.5s" }}>
         <AskBar onAsk={ask} className="max-w-lg" />
         <PromptTiles onPick={ask} />
       </div>
 
       <a
         href="#about"
-        className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 text-xs font-medium text-muted transition-colors hover:text-foreground"
+        className={`absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 text-xs font-medium text-muted transition duration-500 hover:text-foreground ${
+          scrolled ? "pointer-events-none opacity-0" : ""
+        }`}
       >
         Scroll to explore
-        <Icon name="chevron-down" className="h-4 w-4 animate-bounce" />
+        <Icon name="chevron-down" className={`h-4 w-4 ${scrolled ? "" : "animate-bounce"}`} />
       </a>
     </section>
   );

@@ -22,7 +22,7 @@ export default function Research() {
           href={links.scholar}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium backdrop-blur-lg transition-all hover:border-border-strong hover:shadow-lg"
+          className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium backdrop-blur-lg transition hover:border-border-strong hover:shadow-lg"
         >
           <Icon name="scholar" className="h-4 w-4 text-accent" />
           View on Google Scholar

@@ -11,7 +11,7 @@ export default function PublicationList({ compact = false }: { compact?: boolean
             href={p.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`group flex gap-4 rounded-3xl border border-border bg-card backdrop-blur-lg transition-all duration-300 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-xl hover:shadow-black/5 ${
+            className={`group flex gap-4 rounded-3xl border border-border bg-card backdrop-blur-lg transition duration-300 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-xl hover:shadow-black/5 ${
               compact ? "p-4" : "p-6 md:gap-6 md:p-8"
             }`}
           >

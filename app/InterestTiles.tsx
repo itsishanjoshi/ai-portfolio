@@ -7,7 +7,7 @@ export default function InterestTiles({ compact = false }: { compact?: boolean }
       {interests.map((it, i) => (
         <li
           key={it.name}
-          className={`group relative overflow-hidden rounded-2xl border border-border bg-background/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5 ${
+          className={`group relative overflow-hidden rounded-2xl border border-border bg-background/40 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5 ${
             compact ? "flex items-center gap-3 p-3 animate-fade-up" : "flex flex-col items-start gap-3 p-5"
           }`}
           style={compact ? { animationDelay: `${i * 80}ms`, animationDuration: "0.45s" } : undefined}

@@ -28,7 +28,7 @@ export default function Skills() {
                 onMouseEnter={() => setHovered(g.id)}
                 onMouseLeave={() => setHovered(null)}
                 onClick={() => setHovered(lit ? null : g.id)}
-                className="group relative h-full overflow-hidden rounded-3xl border border-border bg-card p-6 backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5"
+                className="group relative h-full overflow-hidden rounded-3xl border border-border bg-card p-6 backdrop-blur-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5"
                 style={lit ? { borderColor: `${g.color}66` } : undefined}
               >
                 <div
@@ -44,7 +44,7 @@ export default function Skills() {
                   {g.items.map((s, j) => (
                     <span
                       key={s}
-                      className="rounded-full border px-2.5 py-1 text-[13px] font-medium transition-all duration-300"
+                      className="rounded-full border px-2.5 py-1 text-[13px] font-medium transition duration-300"
                       style={
                         lit
                           ? {

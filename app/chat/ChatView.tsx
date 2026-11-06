@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import AskBar from "../AskBar";
 import Avatar from "../Avatar";
 import Icon from "../Icons";
 import Portrait from "../Portrait";
 import PromptTiles from "../PromptTiles";
 import { answer, type CardKind } from "../lib/assistant";
+import { prefersReducedMotion } from "../lib/motion";
 import { suggestedQuestions } from "../lib/prompts";
 import { profile } from "../lib/profile";
 import ChatCard from "./ChatCards";
@@ -41,7 +42,8 @@ function tokenize(text: string): Token[] {
 }
 
 const WORD_MS = 28; // delay between streamed words
-const THINK_MS = 550; // "typing…" pause before the answer starts
+const MAX_STREAM_MS = 1000; // long answers reveal several words per tick to finish within this
+const THINK_MS = 200; // "typing…" pause before the answer starts
 
 export default function ChatView({ initialQuery, photo }: { initialQuery?: string; photo?: string | null }) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -71,19 +73,31 @@ export default function ChatView({ initialQuery, photo }: { initialQuery?: strin
       const tokens = tokenize(reply.text);
       const userId = nextId.current++;
       const botId = nextId.current++;
+      const instant = prefersReducedMotion();
       setMessages((m) => [
         ...m,
         { id: userId, role: "user", text: question },
-        { id: botId, role: "assistant", tokens, shown: 0, card: reply.card, focus: reply.focus, followUps: reply.followUps, thinking: true },
+        {
+          id: botId,
+          role: "assistant",
+          tokens,
+          shown: instant ? tokens.length : 0,
+          card: reply.card,
+          focus: reply.focus,
+          followUps: reply.followUps,
+          thinking: !instant,
+        },
       ]);
+      if (instant) return;
 
       // short "thinking" pause, then stream the answer one word at a time
       const s: NonNullable<typeof stream.current> = { id: botId };
       stream.current = s;
       s.timeout = setTimeout(() => {
+        const step = Math.max(1, Math.ceil((tokens.length * WORD_MS) / MAX_STREAM_MS));
         let shown = 0;
         s.interval = setInterval(() => {
-          shown += 1;
+          shown = Math.min(shown + step, tokens.length);
           setMessages((m) => m.map((msg) => (msg.id === botId ? { ...msg, thinking: false, shown } : msg)));
           if (shown >= tokens.length) {
             clearInterval(s.interval);
@@ -94,6 +108,11 @@ export default function ChatView({ initialQuery, photo }: { initialQuery?: strin
     },
     [finishStreaming],
   );
+
+  // lets the landing page finish its view transition once this page is in the DOM
+  useLayoutEffect(() => {
+    window.dispatchEvent(new Event("chat-ready"));
+  }, []);
 
   // stop timers if the visitor leaves the page mid-answer
   useEffect(() => () => {
@@ -117,7 +136,7 @@ export default function ChatView({ initialQuery, photo }: { initialQuery?: strin
   useEffect(() => {
     if (!messages.length) return;
     const users = document.querySelectorAll("[data-user-msg]");
-    users[users.length - 1]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    users[users.length - 1]?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
   }, [messages.length]);
 
   const empty = messages.length === 0;
@@ -206,7 +225,7 @@ export default function ChatView({ initialQuery, photo }: { initialQuery?: strin
                               key={f}
                               type="button"
                               onClick={() => ask(f)}
-                              className="cursor-pointer rounded-full border border-border px-3 py-1.5 text-sm text-muted transition-all hover:border-border-strong hover:text-foreground active:scale-95"
+                              className="cursor-pointer rounded-full border border-border px-3 py-1.5 text-sm text-muted transition hover:border-border-strong hover:text-foreground active:scale-95"
                             >
                               {f}
                             </button>
@@ -261,7 +280,7 @@ export default function ChatView({ initialQuery, photo }: { initialQuery?: strin
                 type="button"
                 onClick={() => setDrawer((d) => !d)}
                 aria-expanded={drawer}
-                className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-2 text-sm font-medium backdrop-blur-lg transition-all hover:bg-subtle"
+                className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-2 text-sm font-medium backdrop-blur-lg transition hover:bg-subtle"
               >
                 <Icon name="sparkles" color="#856ED9" className="h-4 w-4" />
                 <span className="hidden sm:inline">Need inspiration?</span>

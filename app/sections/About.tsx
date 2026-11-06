@@ -44,7 +44,7 @@ export default function About() {
             <div className="mt-5 flex items-center gap-2 text-sm text-muted">
               <Icon name="pin" className="h-4 w-4" />
               {profile.location}
-              <span className="ml-auto flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              <span data-loops className="ml-auto flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
                 AI Engineer at Amity University
               </span>
@@ -72,7 +72,7 @@ export default function About() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={l.label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-border transition-all hover:-translate-y-0.5 hover:border-border-strong hover:bg-subtle"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-border transition hover:-translate-y-0.5 hover:border-border-strong hover:bg-subtle"
                 >
                   <Icon name={l.icon} className="h-4 w-4" />
                 </a>

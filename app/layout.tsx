@@ -36,7 +36,13 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${geistMono.variable} min-h-screen font-sans antialiased`}>{children}</body>
+      <body className={`${inter.variable} ${geistMono.variable} min-h-screen font-sans antialiased`}>
+        {/* scroll reveals need JavaScript, so without it the sections just show */}
+        <noscript>
+          <style dangerouslySetInnerHTML={{ __html: ".reveal{opacity:1;transform:none}" }} />
+        </noscript>
+        {children}
+      </body>
     </html>
   );
 }

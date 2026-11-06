@@ -20,6 +20,7 @@ export default function AskBar({
   return (
     <form
       className={`relative w-full ${className}`}
+      style={{ viewTransitionName: "ask-bar" }}
       onSubmit={(e) => {
         e.preventDefault();
         const q = value.trim();
@@ -28,7 +29,7 @@ export default function AskBar({
         setValue("");
       }}
     >
-      <div className="mx-auto flex items-center rounded-full border border-border bg-card py-2.5 pr-2 pl-6 backdrop-blur-lg transition-all hover:border-border-strong focus-within:border-border-strong focus-within:shadow-lg focus-within:shadow-black/5">
+      <div className="mx-auto flex items-center rounded-full border border-border bg-card py-2.5 pr-2 pl-6 backdrop-blur-lg transition hover:border-border-strong focus-within:border-border-strong focus-within:shadow-lg focus-within:shadow-black/5">
         <label htmlFor="ask" className="sr-only">
           Ask a question about Ishan
         </label>
@@ -46,7 +47,7 @@ export default function AskBar({
           type="submit"
           disabled={!value.trim()}
           aria-label="Submit question"
-          className="flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-accent p-2.5 text-white transition-all hover:bg-accent-hover active:scale-90 disabled:cursor-default disabled:opacity-70"
+          className="flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-accent p-2.5 text-white transition hover:bg-accent-hover active:scale-90 disabled:cursor-default disabled:opacity-70"
         >
           <Icon name="arrow-right" className="h-5 w-5" />
         </button>

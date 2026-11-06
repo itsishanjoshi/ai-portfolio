@@ -17,7 +17,7 @@ export default function Education() {
       <div className="grid gap-4 md:grid-cols-2">
         {education.map((e, i) => (
           <Reveal key={e.degree} delay={i * 100}>
-            <div className="group h-full rounded-3xl border border-border bg-card p-6 backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5 md:p-8">
+            <div className="group h-full rounded-3xl border border-border bg-card p-6 backdrop-blur-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5 md:p-8">
               <div className="flex items-start justify-between gap-4">
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#B95F9C]/10 transition-transform duration-300 group-hover:scale-110">
                   <Icon name="cap" color="#B95F9C" className="h-6 w-6" />
